@@ -28,7 +28,9 @@ def scrape_section(current_page: str):
             driver.find_element(By.CSS_SELECTOR, "[name='chevronRight']").find_element(By.XPATH, "..").click()
         first_run = False
         # Get images on current page
-        images = driver.find_elements(By.CSS_SELECTOR, "[alt='Front Of Card Art']")
+        images = WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located((By.CSS_SELECTOR, "[alt='Front Of Card Art']"))
+        )
         print("- {page} page has {num} images.".format(page=current_page, num=len(images)))
         # Process images
         for image in images:
@@ -39,14 +41,14 @@ def scrape_section(current_page: str):
                 image.click()
             current_card_title = driver.find_element(By.CSS_SELECTOR, "h3.text-2xl.order-2.md\\:order-1.text-neutral-50.font-extrabold").text
             # Process front
+            image_relative_src = driver\
+                .find_element(By.CLASS_NAME, "ml\\:card-modal-grid-child-left")\
+                .find_element(By.CSS_SELECTOR, "img")\
+                .get_attribute("src")
+            url = urljoin("https://starwarsunlimited.com", image_relative_src)
+            response = requests.get(url)
+            file_name = os.path.join(landing_folder_name, current_card_title.replace(" ", "-")+"-front.png")
             try:
-                image_relative_src = driver\
-                    .find_element(By.CLASS_NAME, "ml\\:card-modal-grid-child-left")\
-                    .find_element(By.CSS_SELECTOR, "img")\
-                    .get_attribute("src")
-                url = urljoin("https://starwarsunlimited.com", image_relative_src)
-                response = requests.get(url)
-                file_name = os.path.join(landing_folder_name, current_card_title.replace(" ", "-")+"-front.png")
                 with open(file_name, "wb") as f:
                     f.write(response.content)
                     images_saved += 1
@@ -55,14 +57,14 @@ def scrape_section(current_page: str):
             # Process back
             if current_page == "Leaders":
                 driver.find_element(By.XPATH, "//button[text()='Back']").click()
+                image_relative_src = driver\
+                    .find_element(By.CLASS_NAME, "ml\\:card-modal-grid-child-left")\
+                    .find_element(By.CSS_SELECTOR, "img")\
+                    .get_attribute("src")
+                url = urljoin("https://starwarsunlimited.com", image_relative_src)
+                response = requests.get(url)
+                file_name = os.path.join(landing_folder_name, current_card_title.replace(" ", "-")+"-back.png")
                 try:
-                    image_relative_src = driver\
-                        .find_element(By.CLASS_NAME, "ml\\:card-modal-grid-child-left")\
-                        .find_element(By.CSS_SELECTOR, "img")\
-                        .get_attribute("src")
-                    url = urljoin("https://starwarsunlimited.com", image_relative_src)
-                    response = requests.get(url)
-                    file_name = os.path.join(landing_folder_name, current_card_title.replace(" ", "-")+"-back.png")
                     with open(file_name, "wb") as f:
                         f.write(response.content)
                         images_saved += 1
@@ -96,16 +98,16 @@ arguments[0].remove();
 driver.find_element(By.ID, "didomi-notice-disagree-button").click()
 
 # Leaders
-#driver.find_element(By.XPATH, "//div[text()='Leaders']").click()
-#scrape_section("Leaders")
+driver.find_element(By.XPATH, "//div[text()='Leaders']").click()
+scrape_section("Leaders")
 
 # Bases
-#driver.execute_script("window.scrollTo(0, 0);")
-#driver.find_element(By.XPATH, "//div[text()='Bases']").click()
-#scrape_section("Bases")
+driver.execute_script("window.scrollTo(0, 0);")
+driver.find_element(By.XPATH, "//div[text()='Bases']").click()
+scrape_section("Bases")
 
 # Units, events, upgrades
-#driver.execute_script("window.scrollTo(0, 0);")
+driver.execute_script("window.scrollTo(0, 0);")
 driver.find_element(By.XPATH, "//div[text()='Units, Events & Upgrades']").click()
 scrape_section("Units-Events-Upgrades")
 
