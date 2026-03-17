@@ -39,39 +39,66 @@ def scrape_section(current_page: str):
             except:
                 driver.find_element(By.CSS_SELECTOR, "svg[name='closeX']").find_element(By.XPATH, "..").click()
                 image.click()
-            current_card_title = driver.find_element(By.CSS_SELECTOR, "h3.text-2xl.order-2.md\\:order-1.text-neutral-50.font-extrabold").text
+            current_card_title = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "h3.text-2xl.order-2.md\\:order-1.text-neutral-50.font-extrabold"))
+            ).text
             # Process front
-            image_relative_src = driver\
-                .find_element(By.CLASS_NAME, "ml\\:card-modal-grid-child-left")\
-                .find_element(By.CSS_SELECTOR, "img")\
-                .get_attribute("src")
-            url = urljoin("https://starwarsunlimited.com", image_relative_src)
-            response = requests.get(url)
-            file_name = os.path.join(landing_folder_name, current_card_title.replace(" ", "-")+"-front.png")
             try:
-                with open(file_name, "wb") as f:
-                    f.write(response.content)
-                    images_saved += 1
-            except:
-                print("- Couldn't save front image of {title}.".format(title=current_card_title))
-            # Process back
-            if current_page == "Leaders":
-                driver.find_element(By.XPATH, "//button[text()='Back']").click()
-                image_relative_src = driver\
-                    .find_element(By.CLASS_NAME, "ml\\:card-modal-grid-child-left")\
-                    .find_element(By.CSS_SELECTOR, "img")\
-                    .get_attribute("src")
-                url = urljoin("https://starwarsunlimited.com", image_relative_src)
+                image_container = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, ".ml\\:card-modal-grid-child-left>img"))
+                )
+                image_relative_src = image_container.get_attribute("srcset")
+                url = urljoin("https://starwarsunlimited.com", image_relative_src.split(",")[0])
                 response = requests.get(url)
-                file_name = os.path.join(landing_folder_name, current_card_title.replace(" ", "-")+"-back.png")
-                try:
+                file_name = os.path.join(landing_folder_name, current_card_title.replace(" ", "-")+"-front.png")
+                if image_relative_src.startswith("data:image"):
+                    base64_data = image_relative_src.split(",")[1]
+                    image_data = base64.b64decode(base64_data)
+                    with open(file_name, "wb") as f:
+                        f.write(image_data)
+                else:
                     with open(file_name, "wb") as f:
                         f.write(response.content)
-                        images_saved += 1
-                except:
-                    print("- Couldn't save back image of {title}.".format(title=current_card_title))
-            driver.find_element(By.CSS_SELECTOR, "svg[name='closeX']").find_element(By.XPATH, "..").click()
-            print("- Stolen '{title}'".format(title=current_card_title))
+                images_saved += 1
+            except Exception as error:
+                print("- Couldn't save front image of {title}: '{err}'".format(title=current_card_title, err=error))
+            # Process back
+            if current_page == "Leaders":
+                WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.XPATH, "//button[text()='Back']"))
+                ).click()
+                try:
+                    image_container = WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, ".ml\\:card-modal-grid-child-left>img"))
+                    )
+                    image_relative_src = image_container.get_attribute("src")
+                    url = urljoin("https://starwarsunlimited.com", image_relative_src.split(",")[0])
+                    response = requests.get(url)
+                    file_name = os.path.join(landing_folder_name, current_card_title.replace(" ", "-")+"-back.png")
+                    if image_relative_src.startswith("data:image"):
+                        base64_data = image_relative_src.split(",")[1]
+                        image_data = base64.b64decode(base64_data)
+                        with open(file_name, "wb") as f:
+                            f.write(image_data)
+                    else:
+                        with open(file_name, "wb") as f:
+                            f.write(response.content)
+                    images_saved += 1
+                except Exception as error:
+                    print("- Couldn't save back image of {title}: '{err}'".format(title=current_card_title, err=error))
+            close_button_container = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "svg[name='closeX']"))
+            )
+            close_button_container.find_element(By.XPATH, "..").click()
+            try:
+                driver.implicitly_wait(0)
+                driver.execute_script("""
+                    arguments[0].remove();
+                """, driver.find_element(By.ID, "maze-contextual-widget-host"))
+                driver.implicitly_wait(10)
+            except:
+                driver.implicitly_wait(10)
+            print("- Stole '{title}'".format(title=current_card_title))
 
 print("=======================")
 print("== SCRAPING STARTED ==")
