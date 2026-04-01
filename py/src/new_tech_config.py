@@ -1,6 +1,6 @@
 import datetime
 
-EXPORT_FOLDER = "is-time-to-steal-{}".format(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
+EXPORT_FOLDER = "its-time-to-steal-{}".format(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
 
 API_ENPOINT = "https://api.swu-db.com"
 

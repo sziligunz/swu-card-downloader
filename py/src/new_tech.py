@@ -30,7 +30,7 @@ def download_images(_set: str):
         with open(os.path.join(Config.EXPORT_FOLDER, choosen_set, "{}.{}".format(title, image_type)), "wb") as front:
             front.write(image_req.content)
             print("- Saved card: {}".format(title))
-            yield title
+        yield title
         if card["DoubleSided"]:
             image_back_req = requests.get(
                 Config.CARD_ENDPOINT(choosen_set, card["Number"]),
@@ -40,5 +40,5 @@ def download_images(_set: str):
             with open(os.path.join(Config.EXPORT_FOLDER, choosen_set, "{}-back.{}".format(title, image_back_type)), "wb") as front:
                 front.write(image_req.content)
                 print("- Saved card: {}-back".format(title))
-                yield "{}-back".format(title)
+            yield "{}-back".format(title)
     
