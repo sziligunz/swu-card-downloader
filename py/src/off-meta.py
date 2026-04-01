@@ -10,7 +10,7 @@ import requests
 import os
 
 # Global vars
-target = "https://sw-unlimited-db.com/sets/secrets-of-power"
+target = "https://sw-unlimited-db.com/sets/legends-of-the-force"
 landing_folder_root = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 images_saved = 0
 
@@ -66,7 +66,11 @@ for i in range(cards_len):
     cards = WebDriverWait(driver, 10).until(
         EC.presence_of_all_elements_located((By.CSS_SELECTOR, "#card-overview > .container > div > a"))
     )
-    download_card(cards[i])
+    try:
+        download_card(cards[i])
+    except Exception as error:
+        print("- Couldn't steal a card.")
+        driver.get(target)
     i += 1
 
 print("=======================")
