@@ -27,7 +27,7 @@ class DownloadWorker(QRunnable):
             self.progress_bar.setValue(count)
             self.label.setText("Processing: {}".format(step))
             QApplication.processEvents()
-        self.label.setText("Finished downloading {} images from set {}.", count, self.combo_box.currentText())
+        self.label.setText("Finished downloading {} images from set {}.".format(count, self.combo_box.currentText()))
 
     def stop(self):
         self.is_running = False
