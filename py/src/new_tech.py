@@ -22,23 +22,17 @@ def download_images(_set: str):
         )
         if "Subtitle" in card:
             title += "_{}".format(card["Subtitle"].replace(" ", "_").replace("-", "_"))
-        image_req = requests.get(
-            Config.CARD_ENDPOINT(choosen_set, card["Number"]),
-            params=Config.IMAGE_PARAM
-        )
+        image_req = requests.get(card["FrontArt"])
         image_type = image_req.headers.get("content-type").split("/")[-1]
         with open(os.path.join(Config.EXPORT_FOLDER, choosen_set, "{}.{}".format(title, image_type)), "wb") as front:
             front.write(image_req.content)
             print("- Saved card: {}".format(title))
         yield title
         if card["DoubleSided"]:
-            image_back_req = requests.get(
-                Config.CARD_ENDPOINT(choosen_set, card["Number"]),
-                params=Config.IMAGE_BACK_PARAM
-            )
+            image_back_req = requests.get(card["BackArt"])
             image_back_type = image_req.headers.get("content-type").split("/")[-1]
             with open(os.path.join(Config.EXPORT_FOLDER, choosen_set, "{}-back.{}".format(title, image_back_type)), "wb") as front:
-                front.write(image_req.content)
+                front.write(image_back_req.content)
                 print("- Saved card: {}-back".format(title))
             yield "{}-back".format(title)
     
