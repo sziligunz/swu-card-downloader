@@ -37,7 +37,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("It's Time To Steal")
+        self.setWindowTitle("Star Wars Unlimited TCG Downloader")
         self.setMinimumSize(500, 300)
 
         vbox = QVBoxLayout()
