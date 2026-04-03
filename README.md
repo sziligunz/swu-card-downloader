@@ -23,13 +23,13 @@ to make your own proxies and print your own cards.
 
 **Windows:**
 
-- From realeses download the `.exe` file
+- From [realeses](https://github.com/sziligunz/swu-card-downloader/releases) download the `.exe` file
 - Probably have to use *"Run as Administrator"* to run the app (I was too
   lazy set up the apps authentication and metadata, so Windows stops you from
   running it by default)
 
 **Linux:**
-- From realses download the app file
+- From [realses](https://github.com/sziligunz/swu-card-downloader/releases) download the app file
 - Might have to give permission to the file to run it: `chmod +x`
 
 ----
