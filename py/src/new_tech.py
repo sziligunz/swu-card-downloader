@@ -1,6 +1,7 @@
 import requests
 import new_tech_config as Config
 import os
+import re
 
 def download_images(_set: str):
     choosen_set = _set
@@ -20,6 +21,7 @@ def download_images(_set: str):
             card["Number"],
             card["Name"].replace(" ", "_").replace("-", "_")
         )
+        title = re.sub(r'[^a-zA-Z0-9\_]', '', title)
         if "Subtitle" in card:
             title += "_{}".format(card["Subtitle"].replace(" ", "_").replace("-", "_"))
         image_req = requests.get(card["FrontArt"])
